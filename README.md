@@ -224,7 +224,7 @@ curl "http://localhost:8081/health"
 - `GEMINI_MODEL`: gemini model
 - `OLLAMA_BASE_URL`: URL for the ollama
 - `OLLAMA_MODEL`: ollama model
-- `OLLAMA_CAVEMAN_MODE`: true or false to active caveman mode
+- `OLLAMA_CAVEMAN_MODE`: true or false to active caveman mode (https://github.com/JuliusBrussee/caveman)
 - `OLLAMA_CAVEMAN_INTENSITY`: lite/full/ultra
 
 ### Configuration Example
