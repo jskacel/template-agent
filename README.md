@@ -220,6 +220,12 @@ curl "http://localhost:8081/health"
 - `GOOGLE_SERVICE_ACCOUNT_FILE`: Google credentials
 - `AGENT_SSL_KEYFILE`: SSL private key path
 - `AGENT_SSL_CERTFILE`: SSL certificate path
+- `LLM_PROVIDER`: llm provider (gemini / ollama)
+- `GEMINI_MODEL`: gemini model
+- `OLLAMA_BASE_URL`: URL for the ollama
+- `OLLAMA_MODEL`: ollama model
+- `OLLAMA_CAVEMAN_MODE`: true or false to active caveman mode
+- `OLLAMA_CAVEMAN_INTENSITY`: lite/full/ultra
 
 ### Configuration Example
 
@@ -237,6 +243,12 @@ POSTGRES_PORT=5432
 
 LANGFUSE_TRACING_ENVIRONMENT=production
 GOOGLE_SERVICE_ACCOUNT_FILE=/path/to/credentials.json
+
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=gemma4:latest
+OLLAMA_CAVEMAN_MODE=true
+OLLAMA_CAVEMAN_INTENSITY=ultra
 ```
 
 ## 🧪 Testing
