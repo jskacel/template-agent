@@ -7,8 +7,10 @@ including initialization, configuration, and agent creation utilities.
 from contextlib import asynccontextmanager
 from typing import Optional
 
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_ollama import ChatOllama
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.prebuilt import create_react_agent
 
@@ -19,6 +21,26 @@ from template_agent.src.settings import settings
 from template_agent.utils.pylogger import get_python_logger
 
 logger = get_python_logger(log_level=settings.PYTHON_LOG_LEVEL)
+
+
+def build_chat_model() -> BaseChatModel:
+    """Construct the configured LangChain chat model (Gemini or local Ollama)."""
+    temperature = 0.3
+    if settings.LLM_PROVIDER == "ollama":
+        base = settings.OLLAMA_BASE_URL.rstrip("/")
+        logger.info(
+            f"Using Ollama LLM backend (model={settings.OLLAMA_MODEL}, base_url={base})"
+        )
+        return ChatOllama(
+            model=settings.OLLAMA_MODEL,
+            base_url=base,
+            temperature=temperature,
+        )
+    logger.info(f"Using Google Gemini LLM backend (model={settings.GEMINI_MODEL})")
+    return ChatGoogleGenerativeAI(
+        model=settings.GEMINI_MODEL,
+        temperature=temperature,
+    )
 
 
 async def initialize_database() -> None:
@@ -161,7 +183,7 @@ async def get_template_agent(
             )
 
     # Initialize the language model
-    model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3)
+    model = build_chat_model()
 
     if not enable_checkpointing:
         # Create agent without checkpointing for streaming-only operations

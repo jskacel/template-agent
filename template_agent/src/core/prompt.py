@@ -6,6 +6,9 @@ template agent to provide consistent behavior and instructions.
 
 from datetime import datetime
 
+from template_agent.src.core.caveman_skill_prompt import build_caveman_system_addon
+from template_agent.src.settings import settings
+
 
 def get_current_date() -> str:
     """Get the current date in a formatted string.
@@ -28,7 +31,7 @@ def get_system_prompt() -> str:
     """
     current_date = get_current_date()
 
-    return (
+    base = (
         f"You are Template Agent, a powerful and helpful assistant with the ability to use specialized tools.\n\n"
         f"Today's date is {current_date}.\n\n"
         "A few things to remember:\n"
@@ -47,3 +50,8 @@ def get_system_prompt() -> str:
         "- For the final response, provide a well-structured Markdown summary.\n"
         "- For intermediate responses, use simple Markdown formatting.\n"
     )
+
+    if settings.LLM_PROVIDER == "ollama" and settings.OLLAMA_CAVEMAN_MODE:
+        return base + build_caveman_system_addon(settings.OLLAMA_CAVEMAN_INTENSITY)
+
+    return base

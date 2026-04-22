@@ -60,7 +60,9 @@ async def message_generator(
             yield f"{json.dumps(event, separators=(',', ':'))}\n\n"
 
     except Exception as e:
-        app_logger.error(f"Error in message generator: {e}")
+        app_logger.error(
+            f"Error in message generator: {type(e).__name__}: {e!r}", exc_info=True
+        )
         error_event = {
             "type": "error",
             "content": {

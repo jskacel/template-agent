@@ -36,7 +36,12 @@ def validate_and_initialize_config() -> None:
     try:
         # Use the validate_config function from settings.py
         validate_config_func(settings)
-        initialize_google_genai()
+        if settings.LLM_PROVIDER == "google":
+            initialize_google_genai()
+        else:
+            logger.info(
+                "LLM_PROVIDER is ollama; skipping Google Generative AI credential init"
+            )
 
         logger.info("Configuration validation and initialization passed")
 

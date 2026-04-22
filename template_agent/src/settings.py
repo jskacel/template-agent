@@ -5,7 +5,7 @@ BaseSettings for environment variable loading, validation, and default
 value handling for the template agent service.
 """
 
-from typing import Optional
+from typing import Literal, Optional
 
 from dotenv import load_dotenv
 from pydantic import Field
@@ -70,6 +70,37 @@ class Settings(BaseSettings):
         default="pgvector", json_schema_extra={"env": "POSTGRES_HOST"}
     )
     POSTGRES_PORT: int = Field(default=5432, json_schema_extra={"env": "POSTGRES_PORT"})
+
+    # Language model (Google Gemini or local Ollama)
+    LLM_PROVIDER: Literal["google", "ollama"] = Field(
+        default="google",
+        json_schema_extra={"env": "LLM_PROVIDER"},
+    )
+    GEMINI_MODEL: str = Field(
+        default="gemini-2.5-flash",
+        json_schema_extra={"env": "GEMINI_MODEL"},
+    )
+    OLLAMA_BASE_URL: str = Field(
+        default="http://localhost:11434",
+        json_schema_extra={"env": "OLLAMA_BASE_URL"},
+    )
+    OLLAMA_MODEL: str = Field(
+        default="llama3.2",
+        json_schema_extra={"env": "OLLAMA_MODEL"},
+    )
+    OLLAMA_CAVEMAN_MODE: bool = Field(
+        default=False,
+        json_schema_extra={
+            "env": "OLLAMA_CAVEMAN_MODE",
+            "description": "Append caveman-style instructions to system prompt when LLM_PROVIDER=ollama",
+        },
+    )
+    OLLAMA_CAVEMAN_INTENSITY: Literal[
+        "lite", "full", "ultra", "wenyan-lite", "wenyan-full", "wenyan-ultra"
+    ] = Field(
+        default="full",
+        json_schema_extra={"env": "OLLAMA_CAVEMAN_INTENSITY"},
+    )
 
     # Google Service Account Configuration
     GOOGLE_SERVICE_ACCOUNT_FILE: Optional[str] = Field(
@@ -197,6 +228,26 @@ def validate_config(settings: Settings) -> None:
         raise AppException(
             f"PYTHON_LOG_LEVEL must be one of {valid_log_levels}, got {settings.PYTHON_LOG_LEVEL}",
             AppExceptionCode.CONFIGURATION_VALIDATION_ERROR,
+        )
+
+    if not settings.OLLAMA_MODEL.strip():
+        logger.error("OLLAMA_MODEL must be a non-empty string when using Ollama")
+        raise AppException(
+            "OLLAMA_MODEL must be a non-empty string",
+            AppExceptionCode.CONFIGURATION_VALIDATION_ERROR,
+        )
+
+    if not settings.GEMINI_MODEL.strip():
+        logger.error("GEMINI_MODEL must be a non-empty string")
+        raise AppException(
+            "GEMINI_MODEL must be a non-empty string",
+            AppExceptionCode.CONFIGURATION_VALIDATION_ERROR,
+        )
+
+    if settings.OLLAMA_CAVEMAN_MODE and settings.LLM_PROVIDER != "ollama":
+        logger.warning(
+            "OLLAMA_CAVEMAN_MODE is enabled but LLM_PROVIDER is not ollama; "
+            "caveman prompt block will not be applied"
         )
 
 

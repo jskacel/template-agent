@@ -123,7 +123,10 @@ class AgentManager:
                 )
 
             except Exception as e:
-                app_logger.error(f"Error in AgentManager stream_response: {e}")
+                app_logger.error(
+                    f"Error in AgentManager stream_response: {type(e).__name__}: {e!r}",
+                    exc_info=True,
+                )
                 yield {
                     "type": "error",
                     "content": {

@@ -25,6 +25,12 @@ class TestSettings:
         assert settings.POSTGRES_HOST == "pgvector"
         assert settings.POSTGRES_PORT == 5432
         assert settings.LANGFUSE_TRACING_ENVIRONMENT == "development"
+        assert settings.LLM_PROVIDER == "google"
+        assert settings.GEMINI_MODEL == "gemini-2.5-flash"
+        assert settings.OLLAMA_BASE_URL == "http://localhost:11434"
+        assert settings.OLLAMA_MODEL == "llama3.2"
+        assert not settings.OLLAMA_CAVEMAN_MODE
+        assert settings.OLLAMA_CAVEMAN_INTENSITY == "full"
 
     @patch.dict("os.environ", {}, clear=True)
     def test_database_uri_property(self):
